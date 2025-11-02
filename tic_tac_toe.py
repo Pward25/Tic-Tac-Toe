@@ -26,10 +26,8 @@ class TicTacToe(arcade.Window):
             self.select_sound = arcade.load_sound("select.mp3")
             self.lose_sound = arcade.load_sound("lose.mp3")
             self.win_sound = arcade.load_sound("win.mp3")
-            print("Sounds loaded successfully!")
+            
         except Exception as e:
-            print(f"Error loading sounds: {e}")
-            print("Make sure select.mp3, lose.mp3, and win.mp3 are in the same folder as this script")
             self.select_sound = None
             self.lose_sound = None
             self.win_sound = None
