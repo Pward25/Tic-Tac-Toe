@@ -21,6 +21,22 @@ class TicTacToe(arcade.Window):
         self.waiting_for_computer = False
         self.computer_move_timer = 0
         
+        # Load sound effects
+        # Note: Download the sound files from your GitHub repo and place them in the same folder as this script
+        # Or update the paths below to where your sound files are located
+        try:
+            # Try loading from local files first
+            self.select_sound = arcade.load_sound("select.mp3")
+            self.lose_sound = arcade.load_sound("lose.mp3")
+            self.win_sound = arcade.load_sound("win.mp3")
+            print("Sounds loaded successfully!")
+        except Exception as e:
+            print(f"Error loading sounds: {e}")
+            print("Make sure select.mp3, lose.mp3, and win.mp3 are in the same folder as this script")
+            self.select_sound = None
+            self.lose_sound = None
+            self.win_sound = None
+        
     def on_draw(self):
         self.clear()
         
@@ -128,12 +144,16 @@ class TicTacToe(arcade.Window):
             # Menu selection
             if self.is_button_clicked(x, y, SCREEN_WIDTH // 2, 380, 250, 50):
                 self.game_mode = 'PVP'
+                self.play_sound(self.select_sound)
             elif self.is_button_clicked(x, y, SCREEN_WIDTH // 2, 240, 200, 45):
                 self.game_mode = 'EASY'
+                self.play_sound(self.select_sound)
             elif self.is_button_clicked(x, y, SCREEN_WIDTH // 2, 180, 200, 45):
                 self.game_mode = 'MEDIUM'
+                self.play_sound(self.select_sound)
             elif self.is_button_clicked(x, y, SCREEN_WIDTH // 2, 120, 200, 45):
                 self.game_mode = 'HARD'
+                self.play_sound(self.select_sound)
             return
         
         # Check back button
@@ -157,11 +177,16 @@ class TicTacToe(arcade.Window):
             row = int((y - GRID_OFFSET_Y) // CELL_SIZE)
             
             if self.board[row][col] == '':
+                self.play_sound(self.select_sound)
                 self.make_move(row, col)
     
     def is_button_clicked(self, x, y, btn_x, btn_y, width, height):
         return (btn_x - width/2 <= x <= btn_x + width/2 and
                 btn_y - height/2 <= y <= btn_y + height/2)
+    
+    def play_sound(self, sound):
+        if sound:
+            arcade.play_sound(sound)
     
     def make_move(self, row, col):
         self.board[row][col] = self.current_player
@@ -169,6 +194,14 @@ class TicTacToe(arcade.Window):
         if self.check_winner():
             self.game_over = True
             self.winner = self.current_player
+            # Play win/lose sound
+            if self.game_mode != 'PVP':
+                if self.current_player == 'X':
+                    self.play_sound(self.win_sound)
+                else:
+                    self.play_sound(self.lose_sound)
+            else:
+                self.play_sound(self.win_sound)
         elif self.is_board_full():
             self.game_over = True
             self.winner = None
@@ -309,4 +342,4 @@ def main():
     arcade.run()
 
 if __name__ == "__main__":
-    main() 
+    main()
