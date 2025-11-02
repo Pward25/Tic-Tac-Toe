@@ -21,11 +21,8 @@ class TicTacToe(arcade.Window):
         self.waiting_for_computer = False
         self.computer_move_timer = 0
         
-        # Load sound effects
-        # Note: Download the sound files from your GitHub repo and place them in the same folder as this script
-        # Or update the paths below to where your sound files are located
+       
         try:
-            # Try loading from local files first
             self.select_sound = arcade.load_sound("select.mp3")
             self.lose_sound = arcade.load_sound("lose.mp3")
             self.win_sound = arcade.load_sound("win.mp3")
@@ -40,20 +37,16 @@ class TicTacToe(arcade.Window):
     def on_draw(self):
         self.clear()
         
-        # Draw title
         arcade.draw_text("TIC TAC TOE", SCREEN_WIDTH // 2, SCREEN_HEIGHT - 40,
                         arcade.color.BLACK, 32, anchor_x="center", bold=True)
         
         if self.game_mode is None:
-            # Draw menu
             arcade.draw_text("Choose Game Mode:", SCREEN_WIDTH // 2, 480,
                            arcade.color.BLACK, 24, anchor_x="center", bold=True)
             
-            # Player vs Player button
             self.draw_button(SCREEN_WIDTH // 2, 380, 250, 50, "Player vs Player",
                            arcade.color.LIGHT_BLUE, arcade.color.BLACK)
             
-            # VS Computer buttons
             arcade.draw_text("VS Computer:", SCREEN_WIDTH // 2, 300,
                            arcade.color.BLACK, 20, anchor_x="center", bold=True)
             
@@ -68,7 +61,6 @@ class TicTacToe(arcade.Window):
             
             return
         
-        # Draw grid lines
         for i in range(1, GRID_SIZE):
             x = GRID_OFFSET_X + i * CELL_SIZE
             arcade.draw_line(x, GRID_OFFSET_Y, x, GRID_OFFSET_Y + GRID_SIZE * CELL_SIZE,
@@ -77,7 +69,6 @@ class TicTacToe(arcade.Window):
             arcade.draw_line(GRID_OFFSET_X, y, GRID_OFFSET_X + GRID_SIZE * CELL_SIZE, y,
                            arcade.color.BLACK, 3)
         
-        # Draw board border
         border_left = GRID_OFFSET_X
         border_right = GRID_OFFSET_X + GRID_SIZE * CELL_SIZE
         border_bottom = GRID_OFFSET_Y
@@ -85,7 +76,6 @@ class TicTacToe(arcade.Window):
         arcade.draw_lrbt_rectangle_outline(border_left, border_right, border_bottom, border_top,
                                           arcade.color.BLACK, 3)
         
-        # Draw X's and O's
         for row in range(GRID_SIZE):
             for col in range(GRID_SIZE):
                 cell_x = GRID_OFFSET_X + col * CELL_SIZE + CELL_SIZE // 2
@@ -103,7 +93,6 @@ class TicTacToe(arcade.Window):
                     arcade.draw_circle_outline(cell_x, cell_y, 50,
                                              arcade.color.RED, 5)
         
-        # Draw game status
         if self.game_over:
             if self.winner:
                 text = f"Player {self.winner} Wins! Click to play again"
@@ -124,7 +113,6 @@ class TicTacToe(arcade.Window):
         arcade.draw_text(text, SCREEN_WIDTH // 2, 30,
                         color, 18, anchor_x="center", bold=True)
         
-        # Draw back button
         if not self.game_over:
             arcade.draw_text("Menu", 30, SCREEN_HEIGHT - 35,
                            arcade.color.GRAY, 14, anchor_x="left")
@@ -141,7 +129,6 @@ class TicTacToe(arcade.Window):
     
     def on_mouse_press(self, x, y, button, modifiers):
         if self.game_mode is None:
-            # Menu selection
             if self.is_button_clicked(x, y, SCREEN_WIDTH // 2, 380, 250, 50):
                 self.game_mode = 'PVP'
                 self.play_sound(self.select_sound)
@@ -156,7 +143,6 @@ class TicTacToe(arcade.Window):
                 self.play_sound(self.select_sound)
             return
         
-        # Check back button
         if 30 <= x <= 100 and SCREEN_HEIGHT - 50 <= y <= SCREEN_HEIGHT - 20:
             self.return_to_menu()
             return
@@ -165,11 +151,9 @@ class TicTacToe(arcade.Window):
             self.reset_game()
             return
         
-        # Don't allow moves during computer's turn
         if self.waiting_for_computer:
             return
         
-        # Check if click is within grid
         if (GRID_OFFSET_X <= x <= GRID_OFFSET_X + GRID_SIZE * CELL_SIZE and
             GRID_OFFSET_Y <= y <= GRID_OFFSET_Y + GRID_SIZE * CELL_SIZE):
             
@@ -194,7 +178,6 @@ class TicTacToe(arcade.Window):
         if self.check_winner():
             self.game_over = True
             self.winner = self.current_player
-            # Play win/lose sound
             if self.game_mode != 'PVP':
                 if self.current_player == 'X':
                     self.play_sound(self.win_sound)
@@ -208,10 +191,9 @@ class TicTacToe(arcade.Window):
         else:
             self.current_player = 'O' if self.current_player == 'X' else 'X'
             
-            # If computer's turn, trigger computer move
             if not self.game_over and self.game_mode != 'PVP' and self.current_player == 'O':
                 self.waiting_for_computer = True
-                self.computer_move_timer = 0.5  # Delay for realism
+                self.computer_move_timer = 0.5 
     
     def on_update(self, delta_time):
         if self.waiting_for_computer:
@@ -229,7 +211,6 @@ class TicTacToe(arcade.Window):
             self.computer_move_hard()
     
     def computer_move_easy(self):
-        # Random move
         empty_cells = [(r, c) for r in range(GRID_SIZE) for c in range(GRID_SIZE)
                       if self.board[r][c] == '']
         if empty_cells:
@@ -237,14 +218,12 @@ class TicTacToe(arcade.Window):
             self.make_move(row, col)
     
     def computer_move_medium(self):
-        # 50% strategic, 50% random
         if random.random() < 0.5:
             self.computer_move_hard()
         else:
             self.computer_move_easy()
     
     def computer_move_hard(self):
-        # Use minimax algorithm for optimal play
         best_score = float('-inf')
         best_move = None
         
@@ -263,7 +242,6 @@ class TicTacToe(arcade.Window):
             self.make_move(best_move[0], best_move[1])
     
     def minimax(self, is_maximizing, alpha, beta):
-        # Check terminal states
         if self.check_winner_for_player('O'):
             return 10
         if self.check_winner_for_player('X'):
@@ -302,17 +280,14 @@ class TicTacToe(arcade.Window):
         return self.check_winner_for_player(self.current_player)
     
     def check_winner_for_player(self, player):
-        # Check rows
         for row in self.board:
             if row[0] == row[1] == row[2] == player:
                 return True
         
-        # Check columns
         for col in range(GRID_SIZE):
             if self.board[0][col] == self.board[1][col] == self.board[2][col] == player:
                 return True
-        
-        # Check diagonals
+
         if self.board[0][0] == self.board[1][1] == self.board[2][2] == player:
             return True
         if self.board[0][2] == self.board[1][1] == self.board[2][0] == player:
